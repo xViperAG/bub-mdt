@@ -4,7 +4,9 @@ local function addOfficer(playerId)
     if officers.get(playerId) then return end
 
     local player = exports.qbx_core:GetPlayer(playerId)
-    if player and player.PlayerData.job.type == 'leo' then
+    if not player then return end
+
+    if player.PlayerData.job.type == 'leo' or player.PlayerData.job.type == 'doj' then
         officers.add(playerId, player.PlayerData.charinfo.firstname, player.PlayerData.charinfo.lastname, player.PlayerData.citizenid)
         MySQL.prepare.await('INSERT INTO `mdt_profiles` (`citizenid`, `image`, `notes`, `lastActive`) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE `lastActive` = NOW()', { player.PlayerData.citizenid, nil, nil })
     end
@@ -20,11 +22,11 @@ RegisterNetEvent('QBCore:Server:OnPlayerLoaded', function()
     addOfficer(source)
 end)
 
-AddEventHandler("qbx_core:server:onGroupUpdate", function(source, groupName)
+AddEventHandler("QBCore:Server:OnJobUpdate", function(source, job)
     local officer = officers.get(source)
 
     if officer then
-        if groupName ~= 'police' then
+        if job.type ~= 'leo' or job.type ~= 'doj' then
             return officers.remove(source)
         end
 
@@ -208,11 +210,11 @@ local selectProfilesFilter = selectProfiles:gsub('LIMIT', [[
 
 function qbx.getProfiles(parameters, filter)
     local query, params
-    
+
     if filter then
         local searchInput = parameters[1]
         params = { "%" .. searchInput .. "%", "%" .. searchInput .. "%", parameters[2] }
-        
+
         query = selectProfilesFilter
     else
         query = selectProfiles
@@ -247,7 +249,7 @@ function qbx.isProfileWanted(citizenid)
     local response = MySQL.rawExecute.await('SELECT * FROM `mdt_warrants` WHERE `citizenid` = ?', {
         citizenid
     })
-    
+
     return response[1] and true or false
 end
 
@@ -275,7 +277,7 @@ function qbx.getLicenses(citizenid)
             citizenid = ?
         ]], { citizenid })?[1]
         local metadata = json.decode(result.metadata)
-    
+
         return metadata.licences
     end
 
@@ -296,6 +298,7 @@ function qbx.getJobs(parameters)
     local job = json.decode(result.job)
     local metadata = json.decode(result.metadata)
     local jobs = {}
+    local otherJobs = GetResourceState('qb-phone'):match('started') and exports['qb-phone']:getJobs(parameters[1])
 
     table.insert(jobs, { job = job.label, gradeLabel = job.grade.name })
 
@@ -308,12 +311,69 @@ function qbx.getJobs(parameters)
         end
     end
 
+    if GetResourceState('qb-phone'):match('started') then
+        for k, v in pairs(otherJobs) do
+            if not sharedJobs[k] then goto continue end
+
+            table.insert(jobs, { job = sharedJobs[k].label, gradeLabel = sharedJobs[k].grades[otherJobs[k].grade].name })
+            ::continue::
+        end
+    end
+
     return jobs
+end
+
+function qbx.getGangs(parameters)
+    local sharedGangs = exports.qbx_core:GetGangs()
+    local result = MySQL.rawExecute.await([[
+        SELECT
+            gang,
+            metadata
+        FROM
+            players
+        WHERE
+            citizenid = ?
+    ]], parameters)?[1]
+    local gang = json.decode(result.gang)
+    local metadata = json.decode(result.metadata)
+    local gangs = {}
+
+    table.insert(gangs, { gang = gang.label, gradeLabel = gang.grade.name })
+
+    if metadata.otherjobs then
+        for k, v in pairs(metadata.otherjobs) do
+            if not sharedGangs[k] then goto continue end
+
+            table.insert(gangs, { gang = k, gradeLabel = sharedGangs[k].grades['' .. v .. ''].name })
+            ::continue::
+        end
+    end
+
+    return gangs
 end
 
 -- Still needs implementation
 function qbx.getProperties(parameters)
+    -- This is for nolag_properties, just follow same procedure for other setups
+    local result = MySQL.query.await(
+        [[SELECT 
+            CASE
+                WHEN p.type = 'IPL' AND p.buildingid IS NULL THEN JSON_EXTRACT(p.metadata, '$.enterData')
+                WHEN p.type = 'IPL' AND p.buildingid IS NOT NULL THEN JSON_EXTRACT(b.metadata, '$.enterData')
+                WHEN p.type = 'MLO' THEN JSON_EXTRACT(p.metadata, '$.managePoint')
+                WHEN p.type = 'Shell' THEN JSON_EXTRACT(p.metadata, '$.enterData')
+                ELSE NULL
+            END AS coords,
+            p.label
+        FROM properties p
+        LEFT JOIN buildings b ON p.buildingid = b.id
+        JOIN properties_owners po ON po.property_id = p.id
+        WHERE po.identifier = ?]], { parameters[1] })
     local properties = {}
+
+    for _, property in pairs(result) do
+        table.insert(properties, { label = property.label, type = property.type })
+    end
 
     return properties
 end
@@ -548,32 +608,40 @@ local selectOfficersForRoster = [[
         player_groups.group IN ("police")
 ]]
 
+local policeJobs = {
+    'police',
+    'bcso',
+    'sasp',
+}
+
 function qbx.fetchRoster()
     local query = selectOfficersForRoster
     local queryResult = MySQL.rawExecute.await(query)
     local rosterOfficers = {}
 
-    local job = exports.qbx_core:GetJob('police')
+    for i = 1, #policeJobs do
+        local job = exports.qbx_core:GetJob(policeJobs[i])
 
-    for _, v in pairs(queryResult) do
-        local charinfo = json.decode(v.charinfo)
-        rosterOfficers[#rosterOfficers+1] = {
-            citizenid = v.citizenid,
-            firstname = charinfo.firstname,
-            lastname = charinfo.lastname,
-            callsign = v.callSign,
-            image = v.image,
-            title = job.grades[v.grade].name,
-            apu = v.apu,
-            air = v.air,
-            mc = v.mc,
-            k9 = v.k9,
-            fto = v.fto,
-            lastActive = v.formatted_lastActive
-        }
+        for _, v in pairs(queryResult) do
+            local charinfo = json.decode(v.charinfo)
+            rosterOfficers[#rosterOfficers+1] = {
+                citizenid = v.citizenid,
+                firstname = charinfo.firstname,
+                lastname = charinfo.lastname,
+                callsign = v.callSign,
+                image = v.image,
+                title = job.grades[v.grade].name,
+                apu = v.apu,
+                air = v.air,
+                mc = v.mc,
+                k9 = v.k9,
+                fto = v.fto,
+                lastActive = v.formatted_lastActive
+            }
+        end
+
+        return rosterOfficers
     end
-    
-    return rosterOfficers
 end
 
 local selectCharacters = [[

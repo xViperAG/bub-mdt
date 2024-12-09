@@ -95,6 +95,21 @@ createProfileCard({
         end,
     },
     {
+        id = 'gangs',
+        title = 'Affiliations',
+        icon = 'skull',
+        getData = function(profile)
+            local gangs = framework.getGangs({profile.citizenid})
+            local gangLabels = {}
+
+            for i = 1, #gangs do
+                gangLabels[#gangLabels+1] = gangs[i].gang .. ' (' ..gangs[i].gradeLabel.. ')'
+            end
+
+            return gangLabels
+        end,
+    },
+    {
         id = 'properties',
         title = 'Properties',
         icon = 'building-skyscraper',

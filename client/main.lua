@@ -81,7 +81,7 @@ local function openMdt()
                 }
             }
         })
-        
+
         local profileCards = lib.callback.await('mdt:getCustomProfileCards')
         local charges = lib.callback.await('mdt:getAllCharges')
 
@@ -123,7 +123,7 @@ if config.isDispatchEnabled then
         if isMdtOpen then return end
 
         local isAuthorised = lib.callback.await('mdt:openDispatch', 500)
-        
+
         if not isAuthorised then return end
 
         isMiniDispatchOpen = true
@@ -226,13 +226,13 @@ RegisterNetEvent('mdt:updateOfficerPositions', function(data)
 
         if officer.citizenid ~= player.citizenid then
             local blip = officerBlips[officer.citizenid]
-    
+
             if not blip then
                 local name = ('police:%s'):format(officer.citizenid)
-                
+
                 blip = AddBlipForCoord(officer.position[2], officer.position[1], officer.position[3])
                 officerBlips[officer.citizenid] = blip
-    
+
                 SetBlipSprite(blip, 1)
                 SetBlipDisplay(blip, 3)
                 SetBlipColour(blip, 42)

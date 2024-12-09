@@ -23,7 +23,7 @@ if config.isDispatchEnabled then
 
     AddEventHandler('CEventGunShot', function(witnesses, ped)
         if IsPedCurrentWeaponSilenced(cache.ped) then return end
-            
+
         WaitTimer('Shooting', function()
             if cache.ped ~= ped then return end
 
@@ -92,7 +92,7 @@ if config.isDispatchEnabled then
         AddEventHandler(event, function(_, ped)
             WaitTimer('Speeding', function()
                 local currentTime = GetGameTimer()
-                
+
                 if currentTime - SpeedTrigger < 10000 then
                     return
                 end
@@ -104,7 +104,7 @@ if config.isDispatchEnabled then
                         return
                     end
                 end
-                
+
                 if GetEntitySpeed(cache.vehicle) * 3.6 < (80 + math.random(0, 20)) then return end
 
                 if cache.ped ~= GetPedInVehicleSeat(cache.vehicle, -1) then return end

@@ -3,7 +3,7 @@ RegisterNetEvent('mdt:addBlip', function(data)
     local transG = 250
     local blip = AddBlipForCoord(data.blipCoords.x, data.blipCoords.y, data.blipCoords.z)
     local blip2 = AddBlipForCoord(data.blipCoords.x, data.blipCoords.y, data.blipCoords.z)
-    
+
     SetBlipSprite(blip, 60)
     SetBlipSprite(blip2, 161)
     SetBlipColour(blip, 38)
