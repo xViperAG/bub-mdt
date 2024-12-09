@@ -118,7 +118,7 @@ createProfileCard({
             local propertyLabels = {}
 
             for i = 1, #properties do
-                propertyLabels[#propertyLabels+1] = properties[i].label .. ' (' ..properties[i].type.. ')'
+                propertyLabels[#propertyLabels+1] = properties[i].label
             end
 
             return propertyLabels

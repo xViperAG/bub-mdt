@@ -372,7 +372,7 @@ function qbx.getProperties(parameters)
     local properties = {}
 
     for _, property in pairs(result) do
-        table.insert(properties, { label = property.label, type = property.type })
+        table.insert(properties, { label = property.label })
     end
 
     return properties
