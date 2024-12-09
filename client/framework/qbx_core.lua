@@ -1,11 +1,11 @@
-local qb = {}
+local qbx = {}
 local officer = {}
 
-qb.loadedEvent = 'QBCore:Client:OnPlayerLoaded'
-qb.logoutEvent = 'QBCore:Client:OnPlayerUnload'
-qb.setGroupEvent = 'QBCore:Client:OnJobUpdate'
+qbx.loadedEvent = 'QBCore:Client:OnPlayerLoaded'
+qbx.logoutEvent = 'QBCore:Client:OnPlayerUnload'
+qbx.setGroupEvent = 'QBCore:Client:OnJobUpdate'
 
-function qb.getOfficerData()
+function qbx.getOfficerData()
     local playerData = QBX.PlayerData
 
     officer.citizenid = playerData.citizenid
@@ -17,24 +17,24 @@ function qb.getOfficerData()
     return officer
 end
 
-function qb.notify(text, type)
+function qbx.notify(text, type)
     exports.qbx_core:Notify(text, type)
 end
 
-function qb.isJobPolice()
+function qbx.isJobPolice()
     return (QBX.PlayerData.job.type == 'leo' or QBX.PlayerData.job.type == 'doj') and true or false
 end
 
-function qb.isOnDuty()
+function qbx.isOnDuty()
     return QBX.PlayerData.job.onduty and true or false
 end
 
-function qb.GetVehiclesByName()
+function qbx.GetVehiclesByName()
     return exports.qbx_core:GetVehiclesByName()
 end
 
-function qb.getPlayerGender()
+function qbx.getPlayerGender()
     return QBX.PlayerData.charinfo.gender == 1 and "Female" or "Male"
 end
 
-return qb
+return qbx
