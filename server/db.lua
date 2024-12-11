@@ -406,11 +406,11 @@ end
 -- Weapons
 
 function db.selectWeapons()
-    return framework.getVehicles()
+    return framework.getWeapons()
 end
 
-function db.selectWeapon(plate)
-    return framework.getVehicle(plate)
+function db.selectWeapon(serial)
+    return framework.getWeapon(serial)
 end
 
 function db.updateWeaponInformation(serial, knownInformation)

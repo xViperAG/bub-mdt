@@ -752,16 +752,16 @@ end
 
 local selectWeapon = [[
     SELECT
-        model,
-        class,
-        serial,
-        owner,
-        notes,
-        image
+        mdt_weapons.model,
+        mdt_weapons.class,
+        mdt_weapons.serial,
+        mdt_weapons.owner,
+        mdt_weapons.notes,
+        mdt_weapons.image
     FROM
         mdt_weapons
     WHERE
-        serial = ?
+        mdt_weapons.serial = ?
 ]]
 
 function qbx.getWeapon(serial)
