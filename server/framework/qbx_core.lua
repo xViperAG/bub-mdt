@@ -750,7 +750,7 @@ function qbx.getWeapons()
     return MySQL.rawExecute.await(selectWeapons)
 end
 
-local selectWeapon = [[
+local selectedWeapon = [[
     SELECT
         mdt_weapons.model,
         mdt_weapons.class,
@@ -765,19 +765,21 @@ local selectWeapon = [[
 ]]
 
 function qbx.getWeapon(serial)
-    local response = MySQL.rawExecute.await(selectWeapon, {serial})?[1]
-    local player = QBX:GetPlayerByCitizenId(response.citizenid) or QBX:GetOfflinePlayer(response.citizenid)
+    local result = MySQL.query.await(selectedWeapon, { serial })?[1]
+    print('This is the primary result: ', json.encode(result))
+
+    local player = QBX:GetPlayerByCitizenId(result.citizenid) or QBX:GetOfflinePlayer(result.citizenid)
 
     if not player then return end
 
     local data = {
-        model = response.model,
-        class = response.class,
-        serial = response.serial,
-        notes = response.notes,
-        image = response.image,
-        known_information = response.known_information,
-        owner = player.PlayerData.charinfo.firstname .. " " .. player.PlayerData.charinfo.lastname .. ' (' .. citizenid .. ')'
+        model = result.model,
+        class = result.class,
+        serial = result.serial,
+        notes = result.notes,
+        image = result.image,
+        known_information = result.known_information,
+        owner = result.owner .. ' (' .. result.citizenid .. ')'
     }
 
     return data

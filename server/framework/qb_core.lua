@@ -725,6 +725,53 @@ function qb.getVehicle(plate)
     return data
 end
 
+local selectWeapons = [[
+    SELECT
+        model,
+        serial
+    FROM
+        mdt_weapons
+]]
+
+function qb.getWeapons()
+    return MySQL.rawExecute.await(selectWeapons)
+end
+
+local selectedWeapon = [[
+    SELECT
+        mdt_weapons.model,
+        mdt_weapons.class,
+        mdt_weapons.serial,
+        mdt_weapons.owner,
+        mdt_weapons.notes,
+        mdt_weapons.image
+    FROM
+        mdt_weapons
+    WHERE
+        mdt_weapons.serial = ?
+]]
+
+function qb.getWeapon(serial)
+    local result = MySQL.query.await(selectedWeapon, { serial })?[1]
+    print('This is the primary result: ', json.encode(result))
+
+    local player = QBCore.Functions.GetPlayerByCitizenId(result.citizenid) or QBCore.Functions.GetOfflinePlayer(result.citizenid)
+
+    if not player then return end
+
+    local data = {
+        model = result.model,
+        class = result.class,
+        serial = result.serial,
+        notes = result.notes,
+        image = result.image,
+        known_information = result.known_information,
+        owner = result.owner .. ' (' .. result.citizenid .. ')'
+    }
+
+    return data
+end
+
 function qb.hireOfficer(data)
     local player = QBCore.Functions.GetPlayerByCitizenId(data.citizenid) or QBCore.Player.GetOfflinePlayer(data.citizenid)
 

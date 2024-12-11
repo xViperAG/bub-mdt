@@ -23,7 +23,7 @@ import TextEditor from "../../TextEditor";
 import "../index.css";
 import locales from "../../../../../locales";
 import useWeaponsStore from "../../../../../stores/weapons/weapons";
-import AvatarModal from "../modals/AvatarModal";
+import WeaponModal from "../modals/WeaponModal";
 import { fetchNui } from "../../../../../utils/fetchNui";
 import { useState } from "react";
 import { modals } from "@mantine/modals";
@@ -100,7 +100,7 @@ const WeaponInformation = () => {
 											),
 											centered: true,
 											size: "sm",
-											children: <AvatarModal />,
+											children: <WeaponModal />,
 										})
 									}
 								>

@@ -452,9 +452,11 @@ serverNuiCallback('getAllWeapons', function(data, cb)
 end)
 
 serverNuiCallback('getWeapon', function(data, cb)
+    print(json.encode(data))
+
     local weapon = {
         model = data.model,
-        class = data.class,
+        class = ('Class: %s'):format(data.class),
         serial = data.serial,
         owner = data.owner,
         notes = data.notes,

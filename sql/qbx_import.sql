@@ -167,6 +167,7 @@ CREATE TABLE IF NOT EXISTS `mdt_weapons` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `serial`  VARCHAR(50)  NOT NULL,
     `owner`   VARCHAR(50) NULL,
+    `citizenid` VARCHAR(50) NULL,
     `notes`    TEXT        NULL,
     `class`   VARCHAR(50) NULL
     `model`   VARCHAR(50) NULL

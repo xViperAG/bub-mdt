@@ -270,6 +270,26 @@ utils.registerCallback('mdt:isVehicleBOLO', function(source, data)
     return isVehicleBOLO(data.plate)
 end)
 
+utils.registerCallback('mdt:getBOLOExpirationDate', function(source, data)
+    return db.getBOLOExpirationDate(data.plate)
+end)
+
+utils.registerCallback('mdt:createBOLO', function(source, data)
+    return db.createBOLO(data.plate, data.expirationDate, data.reason)
+end)
+
+utils.registerCallback('mdt:deleteBOLO', function(source, data)
+    return db.deleteBOLO(data.plate)
+end)
+
+utils.registerCallback('mdt:getBolos', function(source, data)
+    return db.getBolos()
+end)
+
+utils.registerCallback('mdt:getBolo', function(source, data)
+    return db.getBolo(data.plate)
+end)
+
 -- Weapons
 
 utils.registerCallback('mdt:getAllWeapons', function(source, data)
@@ -277,7 +297,9 @@ utils.registerCallback('mdt:getAllWeapons', function(source, data)
 end)
 
 utils.registerCallback('mdt:getWeapon', function(source, data)
-    return db.selectWeapon(data.citizenid)
+    print(json.encode(data))
+
+    return db.selectWeapon(data.serial)
 end)
 
 utils.registerCallback('mdt:saveWeaponInformation', function(source, data)
@@ -301,7 +323,7 @@ local function CreateWeaponInfo(data)
 
     if data.serial == nil then return end
 
-    MySQL.Async.insert('INSERT INTO mdt_weapons (serial, owner, notes, class, model, image) VALUES ( ?, ?, ?, ?, ?, ? )', {
+    MySQL.Async.insert('INSERT INTO mdt_weapons (serial, owner, citizenid, notes, class, model, image) VALUES ( ?, ?, ?, ?, ?, ? )', {
         data.serial, data.owner, data.notes, data.class, data.model, data.image
     })
 end
@@ -309,26 +331,7 @@ end
 exports('CreateWeaponInfo', CreateWeaponInfo)
 RegisterNetEvent('mdt:registerNewWeapon', CreateWeaponInfo)
 
-utils.registerCallback('mdt:getBOLOExpirationDate', function(source, data)
-    return db.getBOLOExpirationDate(data.plate)
-end)
-
-utils.registerCallback('mdt:createBOLO', function(source, data)
-    return db.createBOLO(data.plate, data.expirationDate, data.reason)
-end)
-
-utils.registerCallback('mdt:deleteBOLO', function(source, data)
-    return db.deleteBOLO(data.plate)
-end)
-
-utils.registerCallback('mdt:getBolos', function(source, data)
-    return db.getBolos()
-end)
-
-utils.registerCallback('mdt:getBolo', function(source, data)
-    return db.getBolo(data.plate)
-end)
-
+-- Officers
 utils.registerCallback('mdt:getOfficers', function(source, data)
     return db.getOfficers()
 end)

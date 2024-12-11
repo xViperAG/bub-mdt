@@ -410,6 +410,7 @@ function db.selectWeapons()
 end
 
 function db.selectWeapon(serial)
+    print(serial)
     return framework.getWeapon(serial)
 end
 
@@ -428,7 +429,7 @@ function db.updateWeaponNotes(serial, notes)
 end
 
 function db.updateWeaponImage(serial, imageURL)
-    return MySQL.prepare.await('INSERT INTO `mdt_weapons` (`plate`, `image`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `image` = ?', { serial, imageURL, imageURL })
+    return MySQL.prepare.await('INSERT INTO `mdt_weapons` (`serial`, `image`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `image` = ?', { serial, imageURL, imageURL })
 end
 
 -- Roster
