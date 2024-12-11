@@ -20,6 +20,7 @@ A police MDT with built-in dispatch functionalities. The MDT consists of the fol
 - Dispatch
 - Roster
 - Charges
+- Weapons
 
 # Frameworks
 
@@ -82,4 +83,18 @@ exports['bub-mdt']:CustomAlert({
 exports['bub-mdt']:Shooting()
 exports['bub-mdt']:VehicleShooting()
 exports['bub-mdt']:OfficerDown()
+```
+
+# Weapon Registration
+
+```lua
+exports['bub-mdt']:CreateWeaponInfo({
+    serial = serial,
+    image = imageurl,
+    notes = notes,
+    owner = owner,
+    citizenid = citizenid,
+    class = weapClass,
+    model = weapModel
+})
 ```
