@@ -13,10 +13,10 @@ utils.registerCallback('mdt:openMdt', function()
     local officerData = officers.get(source)
 
     if not officerData then return end
-    
+
     local isAuthorised = officerData and true or false
     local callSign = officerData.callsign
-    
+
     return isAuthorised, callSign
 end)
 
@@ -269,6 +269,45 @@ end exports('isVehicleBOLO', isVehicleBOLO)
 utils.registerCallback('mdt:isVehicleBOLO', function(source, data)
     return isVehicleBOLO(data.plate)
 end)
+
+-- Weapons
+
+utils.registerCallback('mdt:getAllWeapons', function(source, data)
+    return db.selectWeapons()
+end)
+
+utils.registerCallback('mdt:getWeapon', function(source, data)
+    return db.selectWeapon(data.citizenid)
+end)
+
+utils.registerCallback('mdt:saveWeaponInformation', function(source, data)
+    return db.updateWeaponInformation(data.serial, data.knownInformation)
+end)
+
+utils.registerCallback('mdt:saveWeaponNotes', function(source, data)
+    return db.updateWeaponNotes(data.serial, data.notes)
+end)
+
+utils.registerCallback('mdt:updateWeaponImage', function(source, data)
+    return db.updateWeaponImage(data.serial, data.image)
+end)
+
+---@param data table : { serial, image, notes, owner, class, model }
+local function CreateWeaponInfo(data)
+    local results = MySQL.query.await('SELECT * FROM mdt_weapons WHERE serial = ?', {
+        data.serial
+    })
+    if results[1] then return end
+
+    if data.serial == nil then return end
+
+    MySQL.Async.insert('INSERT INTO mdt_weapons (serial, owner, notes, class, model, image) VALUES ( ?, ?, ?, ?, ?, ? )', {
+        data.serial, data.owner, data.notes, data.class, data.model, data.image
+    })
+end
+
+exports('CreateWeaponInfo', CreateWeaponInfo)
+RegisterNetEvent('mdt:registerNewWeapon', CreateWeaponInfo)
 
 utils.registerCallback('mdt:getBOLOExpirationDate', function(source, data)
     return db.getBOLOExpirationDate(data.plate)

@@ -162,3 +162,15 @@ CREATE TABLE IF NOT EXISTS `mdt_bolos` (
     `expiresAt` DATETIME NOT NULL,
     UNIQUE (`plate`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `mdt_weapons` (
+    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `serial`  VARCHAR(50)  NOT NULL,
+    `owner`   VARCHAR(50) NULL,
+    `notes`    TEXT        NULL,
+    `class`   VARCHAR(50) NULL
+    `model`   VARCHAR(50) NULL
+    `image`    VARCHAR(255) NULL,
+    `known_information` JSON NULL,
+    UNIQUE (`plate`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

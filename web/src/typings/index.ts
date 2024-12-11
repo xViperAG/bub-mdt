@@ -9,3 +9,4 @@ export * from './config';
 export * from './roster';
 export * from './report';
 export * from './vehicle';
+export * from './weapon';

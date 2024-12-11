@@ -166,5 +166,10 @@
 	"no_bolos_found": "No bolos found",
 	"goto_vehicle": "Go to vehicle",
 	"already_responding_or_part_of_unit": "You are already responding or not a part of a unit",
-	"responded_to_recent_call": "You responded to the recent call"
+	"responded_to_recent_call": "You responded to the recent call",
+
+	"avatar_description_weapon": "Image URL to use as the weapon image",
+	"weapons": "Weapons",
+	"no_weapon_selected": "No vehicle selected",
+	"weapon_information": "Weapon Information"
 }

@@ -21,6 +21,7 @@ import {
 	IconMap2,
 	IconUsers,
 	IconCar,
+	IconSword,
 	IconProps,
 	Icon,
 } from "@tabler/icons-react";
@@ -83,6 +84,7 @@ const pagesData = [
 	{ link: "incidents", label: "Incidents", icon: IconScript },
 	{ link: "reports", label: "Reports", icon: IconFileDescription },
 	{ link: "vehicles", label: "Vehicles", icon: IconCar },
+	{ link: "weapons", label: "Weapons", icon: IconSword },
 	{ link: "dispatch", label: "Dispatch", icon: IconMap2 },
 	// {link: 'boloWarrants', label: 'Bolos & Warrants', icon: IconZoomExclamation},
 ];

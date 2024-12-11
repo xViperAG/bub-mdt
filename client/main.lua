@@ -407,7 +407,7 @@ serverNuiCallback('getAllVehicles', function(data, cb)
     for i = 1, #data do
         vehicles[#vehicles+1] = {
             plate = data[i].plate,
-            model = VEHICLES[data[i].vehicle].model,
+            model = ('%s %s'):format(VEHICLES[data[i].vehicle].brand, VEHICLES[data[i].vehicle].name),
         }
     end
 
@@ -417,8 +417,8 @@ end)
 serverNuiCallback('getVehicle', function(data, cb)
     local vehicle = {
         plate = data.plate,
-        model = VEHICLES[data.vehicle].model,
-        color = utils.GetColor(json.decode(data.mods).color1) or 'Blue',
+        model = ('%s %s'):format(VEHICLES[data.vehicle].brand, VEHICLES[data.vehicle].name),
+        color = utils.GetColor(json.decode(data.mods).color1) or 'Unknown',
         owner = data.owner,
         notes = data.notes,
         class = utils.GetVehicleClassById(GetVehicleClassFromName(VEHICLES[data.vehicle].hash)) or 'Unknown',
@@ -437,6 +437,37 @@ serverNuiCallback('getBOLOExpirationDate')
 serverNuiCallback('deleteBOLO')
 serverNuiCallback('getBolos')
 serverNuiCallback('getBolo')
+
+-- Weapons
+serverNuiCallback('getAllWeapons', function(data, cb)
+    local weapons = {}
+    for i = 1, #data do
+        weapons[#weapons + 1] = {
+            model = data[i].model,
+            serial = data[i].serial
+        }
+    end
+
+    cb(weapons)
+end)
+
+serverNuiCallback('getWeapon', function(data, cb)
+    local weapon = {
+        model = data.model,
+        class = data.class,
+        serial = data.serial,
+        owner = data.owner,
+        notes = data.notes,
+        image = data.image,
+        knownInformation = json.decode(data.known_information) or {}
+    }
+
+    cb(weapon)
+end)
+
+serverNuiCallback('saveWeaponInformation')
+serverNuiCallback('saveWeaponNotes')
+serverNuiCallback('updateWeaponImage')
 
 -- Dispatch
 serverNuiCallback('respondToCall')

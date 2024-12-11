@@ -1,9 +1,10 @@
+local QBX = exports.qbx_core
 local officers = require 'server.officers'
 
 local function addOfficer(playerId)
     if officers.get(playerId) then return end
 
-    local player = exports.qbx_core:GetPlayer(playerId)
+    local player = QBX:GetPlayer(playerId)
     if not player then return end
 
     if player.PlayerData.job.type == 'leo' or player.PlayerData.job.type == 'doj' then
@@ -152,7 +153,7 @@ function qbx.getCharacterProfile(parameters)
             firstname = charinfo.firstname,
             lastname = charinfo.lastname,
             dob = charinfo.birthdate,
-            phoneNumber = '', -- Get phone number, example: exports["lb-phone"]:GetEquippedPhoneNumber(result.citizenid)
+            phoneNumber = charinfo.phone, -- Get phone number, example: exports["lb-phone"]:GetEquippedPhoneNumber(result.citizenid)
             fingerprint = result.fingerprint or 'Unknown',
             notes = result.notes,
             image = result.image,
@@ -210,11 +211,11 @@ local selectProfilesFilter = selectProfiles:gsub('LIMIT', [[
 
 function qbx.getProfiles(parameters, filter)
     local query, params
-
+    
     if filter then
         local searchInput = parameters[1]
         params = { "%" .. searchInput .. "%", "%" .. searchInput .. "%", parameters[2] }
-
+        
         query = selectProfilesFilter
     else
         query = selectProfiles
@@ -249,12 +250,12 @@ function qbx.isProfileWanted(citizenid)
     local response = MySQL.rawExecute.await('SELECT * FROM `mdt_warrants` WHERE `citizenid` = ?', {
         citizenid
     })
-
+    
     return response[1] and true or false
 end
 
 function qbx.getVehiclesForProfile(parameters)
-    local sharedVehicles = exports.qbx_core:GetVehiclesByName()
+    local sharedVehicles = QBX:GetVehiclesByName()
     local vehicles = MySQL.rawExecute.await('SELECT `plate`, `vehicle` FROM `player_vehicles` WHERE `citizenid` = ?', parameters) or {}
 
     for _, v in pairs(vehicles) do
@@ -266,7 +267,7 @@ function qbx.getVehiclesForProfile(parameters)
 end
 
 function qbx.getLicenses(citizenid)
-    local player = exports.qbx_core:GetPlayerByCitizenId(citizenid)
+    local player = QBX:GetPlayerByCitizenId(citizenid)
     if not player then 
         local result = MySQL.rawExecute.await([[
         SELECT
@@ -354,9 +355,8 @@ end
 
 -- Still needs implementation
 function qbx.getProperties(parameters)
-    -- This is for nolag_properties, just follow same procedure for other setups
-    local result = MySQL.query.await(
-        [[SELECT 
+    local result = MySQL.query.await([[
+        SELECT 
             CASE
                 WHEN p.type = 'IPL' AND p.buildingid IS NULL THEN JSON_EXTRACT(p.metadata, '$.enterData')
                 WHEN p.type = 'IPL' AND p.buildingid IS NOT NULL THEN JSON_EXTRACT(b.metadata, '$.enterData')
@@ -365,10 +365,13 @@ function qbx.getProperties(parameters)
                 ELSE NULL
             END AS coords,
             p.label
-        FROM properties p
+        FROM
+            properties p
         LEFT JOIN buildings b ON p.buildingid = b.id
         JOIN properties_owners po ON po.property_id = p.id
-        WHERE po.identifier = ?]], { parameters[1] })
+        WHERE
+            po.identifier = ?
+    ]], { parameters[1] })
     local properties = {}
 
     for _, property in pairs(result) do
@@ -620,7 +623,7 @@ function qbx.fetchRoster()
     local rosterOfficers = {}
 
     for i = 1, #policeJobs do
-        local job = exports.qbx_core:GetJob(policeJobs[i])
+        local job = QBX:GetJob(policeJobs[i])
 
         for _, v in pairs(queryResult) do
             local charinfo = json.decode(v.charinfo)
@@ -718,7 +721,7 @@ local selectVehicle = [[
 
 function qbx.getVehicle(plate)
     local response = MySQL.rawExecute.await(selectVehicle, {plate})?[1]
-    local player = exports.qbx_core:GetPlayerByCitizenId(response.citizenid) or exports.qbx_core:GetOfflinePlayer(response.citizenid)
+    local player = QBX:GetPlayerByCitizenId(response.citizenid) or QBX:GetOfflinePlayer(response.citizenid)
 
     if not player then return end
 
@@ -730,6 +733,51 @@ function qbx.getVehicle(plate)
         image = response.image,
         known_information = response.known_information,
         owner = player.PlayerData.charinfo.firstname .. " " .. player.PlayerData.charinfo.lastname .. ' (' .. response.citizenid .. ')'
+    }
+
+    return data
+end
+
+local selectWeapons = [[
+    SELECT
+        model,
+        serial
+    FROM
+        mdt_weapons
+]]
+
+function qbx.getWeapons()
+    return MySQL.rawExecute.await(selectWeapons)
+end
+
+local selectWeapon = [[
+    SELECT
+        model,
+        class,
+        serial,
+        owner,
+        notes,
+        image
+    FROM
+        mdt_weapons
+    WHERE
+        serial = ?
+]]
+
+function qbx.getWeapon(serial)
+    local response = MySQL.rawExecute.await(selectWeapon, {serial})?[1]
+    local player = QBX:GetPlayerByCitizenId(response.citizenid) or QBX:GetOfflinePlayer(response.citizenid)
+
+    if not player then return end
+
+    local data = {
+        model = response.model,
+        class = response.class,
+        serial = response.serial,
+        notes = response.notes,
+        image = response.image,
+        known_information = response.known_information,
+        owner = player.PlayerData.charinfo.firstname .. " " .. player.PlayerData.charinfo.lastname .. ' (' .. citizenid .. ')'
     }
 
     return data

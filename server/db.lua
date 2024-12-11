@@ -403,6 +403,34 @@ function db.getBolo(plate)
     })
 end
 
+-- Weapons
+
+function db.selectWeapons()
+    return framework.getVehicles()
+end
+
+function db.selectWeapon(plate)
+    return framework.getVehicle(plate)
+end
+
+function db.updateWeaponInformation(serial, knownInformation)
+    local query = [[
+        INSERT INTO `mdt_weapons` (`serial`, `image`, `notes`, `known_information`) 
+        VALUES (?, NULL, NULL, ?) 
+        ON DUPLICATE KEY UPDATE `known_information` = VALUES(`known_information`)
+    ]]
+
+    return MySQL.prepare.await(query, { serial, json.encode(knownInformation) })
+end
+
+function db.updateWeaponNotes(serial, notes)
+    return MySQL.prepare.await('INSERT INTO `mdt_weapons` (`serial`, `image`, `notes`, `known_information`) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE `notes` = ?', { serial, nil, notes, nil, notes })
+end
+
+function db.updateWeaponImage(serial, imageURL)
+    return MySQL.prepare.await('INSERT INTO `mdt_weapons` (`plate`, `image`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `image` = ?', { serial, imageURL, imageURL })
+end
+
 -- Roster
 function db.selectOfficerCallSign(callsign)
     return MySQL.prepare.await('SELECT `callsign` FROM `mdt_profiles` WHERE callsign = ?', { callsign })

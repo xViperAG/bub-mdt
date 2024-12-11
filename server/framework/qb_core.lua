@@ -211,11 +211,11 @@ local selectProfilesFilter = selectProfiles:gsub('LIMIT', [[
 
 function qb.getProfiles(parameters, filter)
     local query, params
-
+    
     if filter then
         local searchInput = parameters[1]
         params = { "%" .. searchInput .. "%", "%" .. searchInput .. "%", parameters[2] }
-
+        
         query = selectProfilesFilter
     else
         query = selectProfiles
@@ -250,7 +250,7 @@ function qb.isProfileWanted(citizenid)
     local response = MySQL.rawExecute.await('SELECT * FROM `mdt_warrants` WHERE `citizenid` = ?', {
         citizenid
     })
-
+    
     return response[1] and true or false
 end
 
@@ -277,7 +277,7 @@ function qb.getLicenses(citizenid)
             citizenid = ?
         ]], { citizenid })?[1]
         local metadata = json.decode(result.metadata)
-
+    
         return metadata.licences
     end
 
@@ -630,7 +630,7 @@ function qb.fetchRoster()
 
         return rosterOfficers
     end
-
+    
     return rosterOfficers
 end
 

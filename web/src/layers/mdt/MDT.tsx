@@ -21,6 +21,7 @@ import { default as locales, setLocale } from "../../locales";
 import dayjs from "dayjs";
 import { fetchNui } from "../../utils/fetchNui";
 import Vehicles from "./components/Vehicles";
+import Weapons from "./components/Weapons";
 import { isEnvBrowser } from "../../utils/misc";
 
 const MDT: React.FC = () => {
@@ -123,6 +124,7 @@ const MDT: React.FC = () => {
 								<Route path='/incidents' element={<Incidents />} />
 								<Route path='reports' element={<Reports />} />
 								<Route path='vehicles' element={<Vehicles />} />
+								<Route path='weapons' element={<Weapons />} />
 								<Route path='/dispatch' element={<Dispatch />} />
 								<Route path='/roster' element={<Roster />} />
 								<Route path='/charges' element={<Charges />} />
