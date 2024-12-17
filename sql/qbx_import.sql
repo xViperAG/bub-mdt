@@ -173,5 +173,5 @@ CREATE TABLE IF NOT EXISTS `mdt_weapons` (
     `model`   VARCHAR(50) NULL,
     `image`    VARCHAR(255) NULL,
     `known_information` JSON NULL,
-    UNIQUE (`plate`)
+    UNIQUE (`serial`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
