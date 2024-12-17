@@ -169,8 +169,8 @@ CREATE TABLE IF NOT EXISTS `mdt_weapons` (
     `owner`   VARCHAR(50) NULL,
     `citizenid` VARCHAR(50) NULL,
     `notes`    TEXT        NULL,
-    `class`   VARCHAR(50) NULL
-    `model`   VARCHAR(50) NULL
+    `class`   VARCHAR(50) NULL,
+    `model`   VARCHAR(50) NULL,
     `image`    VARCHAR(255) NULL,
     `known_information` JSON NULL,
     UNIQUE (`plate`)
